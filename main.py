@@ -4,11 +4,11 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 load_dotenv()
 # code to get transcript from youtube 
-video_id = "uOcKF-aLHyw" 
+video_id = "c5BIA5RpSpo" 
+transcript = ""
 
 try:
         transcript_list = YouTubeTranscriptApi().fetch(video_id, languages=["en"])
-        transcript = ""
         for snippet in transcript_list:
                 transcript += snippet.text+" "
         # print(transcript)
@@ -19,7 +19,7 @@ except Exception as e:
 #  text splitting and chunking of the transcript
 splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
 texts = splitter.create_documents([transcript])
-# print(texts[0].page_content)
+print(texts[0].page_content)
 
 
 
