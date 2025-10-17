@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from youtube_transcript_api import YouTubeTranscriptApi, NoTranscriptFound
+from youtube_transcript_api import YouTubeTranscriptApi
 
 load_dotenv()
 video_id = "uOcKF-aLHyw" 
@@ -9,8 +9,7 @@ try:
         for snippet in transcript:
             print(f"{snippet.start}: {snippet.text} ({snippet.duration})")
 
-except NoTranscriptFound:
-        print("No captions found for video:", video_id)
+
 except Exception as e:
         print("Failed to fetch transcript:", str(e))
 
