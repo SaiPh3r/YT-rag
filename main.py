@@ -1,8 +1,9 @@
 from dotenv import load_dotenv
 from youtube_transcript_api import YouTubeTranscriptApi
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings , ChatGoogleGenerativeAI
 from langchain_community.vectorstores import FAISS
+from langchain_core.prompts import PromptTemplate
 
 load_dotenv()
 # code to get transcript from youtube 
@@ -32,6 +33,42 @@ retrieval = vector_db.as_retriever(search_type="similarity", search_kwargs={"k":
 
 result = retrieval.invoke('What does “CRUD” stand for ?')
 # print(result)
+
+llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
+
+prompt = PromptTemplate(
+        template="""
+        You are a helpful assistant that answers questions about youtube videos.
+        You are given the following extracted parts of a long document and a question. Provide a conversational answer based on the context provided.
+        If you don't know the answer, just say that you don't know, don't try to make up an answer.
+        {context} 
+        Question: {question}
+        """,
+
+        input_variables=["context", "question"]
+)
+
+question = "How can I become a better developer?"
+retriverDocs = retrieval.invoke(question)
+# print(retriverDocs)
+
+content_text = ""
+for doc in retriverDocs:
+        content_text += doc.page_content
+
+# print(content_text)
+
+final_prompt = prompt.format(context = content_text , question = question)
+# print(final_prompt)
+
+answer = llm.invoke(final_prompt)
+print(answer)
+
+
+
+
+
+
 
 
 
