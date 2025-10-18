@@ -4,6 +4,12 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_google_genai import GoogleGenerativeAIEmbeddings , ChatGoogleGenerativeAI
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import PromptTemplate
+from langchain_core.runnables import (
+    RunnableLambda,
+    RunnableParallel,
+    RunnablePassthrough,
+)
+from langchain_core.output_parsers import StrOutputParser
 
 load_dotenv()
 # code to get transcript from youtube 
@@ -58,12 +64,32 @@ for doc in retriverDocs:
 
 # print(content_text)
 
-final_prompt = prompt.format(context = content_text , question = question)
-# print(final_prompt)
+# final_prompt = prompt.format(context = content_text , question = question)
+# # print(final_prompt)
 
-answer = llm.invoke(final_prompt)
-print(answer)
+# answer = llm.invoke(final_prompt)
+# print(answer)
 
+def format_doc(retriverDocs):
+        content_text = ""
+        for doc in retriverDocs:
+                content_text += doc.page_content
+        return content_text
+
+parallel_chain = RunnableParallel({
+        'context' : retrieval | RunnableLambda(format_doc) , 
+        'question': RunnablePassthrough()
+} 
+)
+# print(parallel_chain.invoke("what is crud"))
+
+parser = StrOutputParser()
+final_chain = parallel_chain | prompt | llm | parser
+result = final_chain.invoke("what is crud")
+print(result)
+
+
+ 
 
 
 
