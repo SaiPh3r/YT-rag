@@ -26,6 +26,14 @@ texts = splitter.create_documents([transcript]) # texts are chunks of the transc
 embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
 vector_db  = FAISS.from_documents(texts, embeddings)
 # print(vector_db.index_to_docstore_id)   # to see the index of the vector db
+# print(len(texts))
+
+retrieval = vector_db.as_retriever(search_type="similarity", search_kwargs={"k": 2})
+
+result = retrieval.invoke('What does “CRUD” stand for ?')
+
+print(result)
+
 
 
 
